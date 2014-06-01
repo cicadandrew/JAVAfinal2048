@@ -7,14 +7,13 @@ public class Start {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
-		Game game = new Game();
+	
 		JFrame window = new JFrame("2048");
+		Game game = new Game();
 		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
 		window.add(game);
-		game.setBackground(Color.white);
 		window.pack();
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
