@@ -48,15 +48,15 @@ public class GameBoardTwo {
 	private String formattedTime = "00:00:000";
 
 	// Saving
-	private String saveDataPath;
+	private String saveDataPathtwo;
 	private String fileName = "SaveDatatwo";
 
 	public GameBoardTwo(int x, int y) {
 		try {
-			saveDataPath = GameBoardOne.class.getProtectionDomain()
+			saveDataPathtwo = GameBoardOne.class.getProtectionDomain()
 					.getCodeSource().getLocation().toURI().getPath();
-			// saveDataPath = System.getProperty("user.home") +
-			// "\\workspace\\2048finalJAVA";
+			saveDataPathtwo = System.getProperty("user.home") +
+			"\\workspace\\2048finalJAVA";
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -79,7 +79,7 @@ public class GameBoardTwo {
 
 	private void createSaveData() {
 		try {
-			File file = new File(saveDataPath, fileName);
+			File file = new File(saveDataPathtwo, fileName);
 
 			FileWriter output = new FileWriter(file);
 			BufferedWriter writer = new BufferedWriter(output);
@@ -99,7 +99,7 @@ public class GameBoardTwo {
 	private void loadHighScore() {
 
 		try {
-			File f = new File(saveDataPath, fileName);
+			File f = new File(saveDataPathtwo, fileName);
 			if (!f.isFile()) {
 				createSaveData();
 			}
@@ -121,7 +121,7 @@ public class GameBoardTwo {
 		FileWriter output = null;
 
 		try {
-			File f = new File(saveDataPath, fileName);
+			File f = new File(saveDataPathtwo, fileName);
 			output = new FileWriter(f);
 			BufferedWriter writer = new BufferedWriter(output);
 
@@ -226,14 +226,14 @@ public class GameBoardTwo {
 
 		}
 
-		if (!win || !dead) {
-			g.setColor(Color.red);
-			g.drawString(
-					"SPEC. to pause",
-					30,
-					85 + DrawUtils.getMessageHeight("SPEC. to pause",
-							Game.main.deriveFont(15f), g));
-		}
+//		if (!win || !dead) {
+//			g.setColor(Color.red);
+//			g.drawString(
+//					"SPEC. to pause",
+//					30,
+//					85 + DrawUtils.getMessageHeight("SPEC. to pause",
+//							Game.main.deriveFont(15f), g));
+//		}
 
 		if (pauseCount % 2 == 1) {
 

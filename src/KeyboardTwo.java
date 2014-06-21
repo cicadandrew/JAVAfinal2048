@@ -9,7 +9,7 @@ public class KeyboardTwo extends Keyboard{
 	}
 
 	public static void update() {
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 4; i++) {
 			switch (i) {
 
 			case 0:
@@ -23,12 +23,6 @@ public class KeyboardTwo extends Keyboard{
 				break;
 			case 3:
 				prev[KeyEvent.VK_D] = pressed[KeyEvent.VK_D];
-				break;
-			case 4:
-				prev[KeyEvent.VK_SPACE] = pressed[KeyEvent.VK_SPACE];
-				break;
-			case 5:
-				prev[KeyEvent.VK_R] = pressed[KeyEvent.VK_R];
 				break;
 			}
 		}

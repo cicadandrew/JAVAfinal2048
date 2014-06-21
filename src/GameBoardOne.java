@@ -40,6 +40,7 @@ public class GameBoardOne {
 	private long pauseTime;
 	private long restartTime = 0;
 	private int pauseCount = 0;
+	private int marqueeStart;
 	private int marqueeTime = 1000;
 	private boolean hasStarted;
 	private boolean reverse;
@@ -48,15 +49,15 @@ public class GameBoardOne {
 	private String formattedTime = "00:00:000";
 
 	// Saving
-	private String saveDataPath;
+	private String saveDataPathone;
 	private String fileName = "SaveDatatwo";
 
 	public GameBoardOne(int x, int y) {
 		try {
-			saveDataPath = GameBoardOne.class.getProtectionDomain()
-					.getCodeSource().getLocation().toURI().getPath();
-			// saveDataPath = System.getProperty("user.home") +
-			// "\\workspace\\2048finalJAVA";
+//			saveDataPath = GameBoardOne.class.getProtectionDomain()
+//					.getCodeSource().getLocation().toURI().getPath();
+			 saveDataPathone = System.getProperty("user.home") +
+			 "\\workspace\\2048finalJAVA";
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -79,7 +80,7 @@ public class GameBoardOne {
 
 	private void createSaveData() {
 		try {
-			File file = new File(saveDataPath, fileName);
+			File file = new File(saveDataPathone, fileName);
 
 			FileWriter output = new FileWriter(file);
 			BufferedWriter writer = new BufferedWriter(output);
@@ -99,7 +100,7 @@ public class GameBoardOne {
 	private void loadHighScore() {
 
 		try {
-			File f = new File(saveDataPath, fileName);
+			File f = new File(saveDataPathone, fileName);
 			if (!f.isFile()) {
 				createSaveData();
 			}
@@ -121,7 +122,7 @@ public class GameBoardOne {
 		FileWriter output = null;
 
 		try {
-			File f = new File(saveDataPath, fileName);
+			File f = new File(saveDataPathone, fileName);
 			output = new FileWriter(f);
 			BufferedWriter writer = new BufferedWriter(output);
 
@@ -197,43 +198,52 @@ public class GameBoardOne {
 
 		// Marquee
 		// Start
-		if (hasStarted && elapsedMS < marqueeTime)
+		if (hasStarted && elapsedMS < 1000) {
+			marqueeStart = 0;
 			Marquee("START", g);
+		}
 
 		// Direction will be reversed if rival's time % this.score = 2
-		// if (reverseCheck < 2
-		// && GameBoardTwo.getElapsedMS() - this.score == 12348) {
-		// reverseCheck++;
-		// reverse = true;
-		// }
-		// if (reverse && elapsedMS < marqueeTime)
-		// Marquee("REVERSE", g);
+		if (reverseCheck < 2
+				&& GameBoardTwo.getElapsedMS() % (this.score + 1) == 2) {
+			reverseCheck++;
+			reverse = true;
+		}
+		if (reverse) {
+			if (reverseCheck == 0)
+				marqueeStart = (int) elapsedMS;
+			Marquee("REVERSE", g);
+		}
 
-		// Block will come out randomly if rival's score is more than 150. (max
+		// Block will come out randomly if rival's score is more than 150 and
+		// 700. (max
 		// Block = 2)
-		
+
 		if (blockCheck < 2) {
-			if (this.getScore() - GameBoardTwo.getScore() > 150 && blockCheck == 0) {
-				Marquee("BLOCK-BOUNCE", g);
+			// if(blockCheck == 0)
+			// marqueeStart = (int) elapsedMS;
+			if (this.getScore() - GameBoardTwo.getScore() > 150
+					&& blockCheck < 1) {
+				// Marquee("BLOCK", g);
 				blockSpawn();
 				blockCheck++;
-			} else if (this.getScore() - GameBoardTwo.getScore() > 700
-					&& blockCheck == 1) {
-				Marquee("BOUNCE-Again", g);
+
+			} else if (this.getScore() - GameBoardTwo.getScore() > 700) {
+				// Marquee("BLOCK", g);
 				blockSpawn();
 				blockCheck++;
 			} else {
 			}
 		}
 
-		if (!win || !dead) {
-			g.setColor(Color.red);
-			g.drawString(
-					"SPEC. to pause",
-					30,
-					85 + DrawUtils.getMessageHeight("SPEC. to pause",
-							Game.main.deriveFont(15f), g));
-		}
+		// if (!win || !dead) {
+		// g.setColor(Color.red);
+		// g.drawString(
+		// "SPEC. to pause",
+		// 30,
+		// 85 + DrawUtils.getMessageHeight("SPEC. to pause",
+		// Game.main.deriveFont(15f), g));
+		// }
 
 		if (pauseCount % 2 == 1) {
 
@@ -444,26 +454,26 @@ public class GameBoardOne {
 	}
 
 	private void Marquee(String marquee, Graphics2D g) {
-		System.out.println(true);
 		g.setColor(new Color(0xBD211F));
 		int marqueeLength = DrawUtils.getMessageWidth(marquee,
 				Game.main.deriveFont(50f), g);
 		int marqueeWidth = DrawUtils.getMessageHeight(marquee,
 				Game.main.deriveFont(50f), g);
 
-		if (elapsedMS < marqueeTime * 0.3)
-			g.drawString(marquee, (int) ((Game.WIDTH - marqueeLength)
-					* elapsedMS / (marqueeTime * 0.3) - marqueeLength),
+		if (elapsedMS - marqueeStart < marqueeTime * 0.3)
+			g.drawString(
+					marquee,
+					(int) ((Game.WIDTH - marqueeLength)
+							* (elapsedMS - marqueeStart) / (marqueeTime * 0.3) - marqueeLength),
 					BOARD_HEIGHT - marqueeWidth - 10);
-		else if (elapsedMS < marqueeTime * 0.7)
+		else if ((elapsedMS - marqueeStart) < marqueeTime * 0.7)
 			g.drawString(marquee, (Game.WIDTH - marqueeLength) / 2,
 					BOARD_HEIGHT - marqueeWidth - 10);
 		else
-			g.drawString(marquee,
-					(int) ((Game.WIDTH - marqueeLength)
-							* (elapsedMS - marqueeTime * 0.4)
-							/ (marqueeTime * 0.3) - marqueeLength),
-					BOARD_HEIGHT - marqueeWidth - 10);
+			g.drawString(marquee, (int) ((Game.WIDTH - marqueeLength)
+					* ((elapsedMS - marqueeStart) - marqueeTime * 0.4)
+					/ (marqueeTime * 0.3) - marqueeLength), BOARD_HEIGHT
+					- marqueeWidth - 10);
 
 	}
 
