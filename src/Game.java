@@ -12,24 +12,36 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	public static int HEIGHT = 500;
 	public static final Font main = new Font("Bebas Neue Regular", Font.PLAIN,
 			28);
+	private int player;
 	private Thread game;
 	private boolean running;
 	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT,
 			BufferedImage.TYPE_INT_RGB);
-	private GameBoard board;
+	private GameBoardOne boardOne;
+	private GameBoardTwo boardTwo;
 
-	public Game() {
+	public Game(int player) {
+		this.player = player;
 		setFocusable(true);
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		addKeyListener(this);
 
-		board = new GameBoard(WIDTH / 2 - GameBoard.BOARD_WIDTH / 2, HEIGHT
-				- GameBoard.BOARD_HEIGHT - 10);
+		if (player == 1)
+			boardOne = new GameBoardOne(WIDTH / 2 - GameBoardOne.BOARD_WIDTH
+					/ 2, HEIGHT - GameBoardOne.BOARD_HEIGHT - 10);
+		else
+			boardTwo = new GameBoardTwo(WIDTH / 2 - GameBoardTwo.BOARD_WIDTH
+					/ 2, HEIGHT - GameBoardTwo.BOARD_HEIGHT - 10);
 	}
 
 	private void update() {
-		board.update();
-		Keyboard.update();
+		if (player == 1) {
+			boardOne.update();
+			KeyboardOne.update();
+		} else {
+			boardTwo.update();
+			KeyboardTwo.update();
+		}
 
 	}
 
@@ -38,7 +50,10 @@ public class Game extends JPanel implements KeyListener, Runnable {
 		Graphics2D g = (Graphics2D) image.getGraphics();
 		g.setColor(Color.white);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
-		board.render(g);
+		if (player == 1)
+			boardOne.render(g);
+		else
+			boardTwo.render(g);
 		g.dispose();
 
 		Graphics2D g2d = (Graphics2D) getGraphics();
@@ -113,27 +128,19 @@ public class Game extends JPanel implements KeyListener, Runnable {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		Keyboard.keyPressed(e);
+		KeyboardOne.keyPressed(e);
 
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		Keyboard.keyreleased(e);
+		KeyboardOne.keyreleased(e);
 
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
 
-	}
-
-	public static void setWIDTH(int wIDTH) {
-		WIDTH = wIDTH;
-	}
-
-	public static void setHEIGHT(int hEIGHT) {
-		HEIGHT = hEIGHT;
 	}
 
 }

@@ -1,39 +1,10 @@
 import java.awt.event.KeyEvent;
 
-public class Keyboard {
 
+public class Keyboard {
 	public static boolean[] pressed = new boolean[256];
 	public static boolean[] prev = new boolean[256];
-
-	private Keyboard() {
-	}
-
-	public static void update() {
-		for (int i = 0; i < 6; i++) {
-			switch (i) {
-			case 0:
-				prev[KeyEvent.VK_LEFT] = pressed[KeyEvent.VK_LEFT];
-				break;
-			case 1:
-				prev[KeyEvent.VK_RIGHT] = pressed[KeyEvent.VK_RIGHT];
-				break;
-			case 2:
-				prev[KeyEvent.VK_UP] = pressed[KeyEvent.VK_UP];
-				break;
-			case 3:
-				prev[KeyEvent.VK_DOWN] = pressed[KeyEvent.VK_DOWN];
-				break;
-
-			case 4:
-				prev[KeyEvent.VK_SPACE] = pressed[KeyEvent.VK_SPACE];
-				break;
-				
-			case 5:
-				prev[KeyEvent.VK_Q] = pressed[KeyEvent.VK_Q];
-				break;
-			}
-		}
-	}
+	public Keyboard(){};
 
 	public static void keyPressed(KeyEvent e) {
 		pressed[e.getKeyCode()] = true;
@@ -46,4 +17,5 @@ public class Keyboard {
 	public static boolean typed(int keyEvent) {
 		return !pressed[keyEvent] && prev[keyEvent];
 	}
+
 }

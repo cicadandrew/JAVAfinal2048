@@ -11,7 +11,7 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.Random;
 
-public class GameBoard {
+public class GameBoardTwo {
 
 	public static final int ROWS = 4;
 	public static final int COLS = 4;
@@ -26,7 +26,7 @@ public class GameBoard {
 	private BufferedImage finalBoard;
 	private int x;
 	private int y;
-	private int score = 0;
+	private static int score = 0;
 	private int highScore = 0;
 	private Font scoreFont;
 
@@ -34,7 +34,7 @@ public class GameBoard {
 	public static int BOARD_WIDTH = (COLS + 1) * SPACING + COLS * Tile.WIDTH;
 	public static int BOARD_HEIGHT = (ROWS + 1) * SPACING + ROWS * Tile.HEIGHT;
 
-	private long elapsedMS;
+	private static long elapsedMS;
 	private long fastestMS;
 	private long startTime;
 	private long pauseTime;
@@ -42,17 +42,18 @@ public class GameBoard {
 	private int pauseCount = 0;
 	private int marqueeTime = 1000;
 	private boolean hasStarted;
+	private int reverseCheck;
 	private boolean reverse;
-	private boolean blockCheck;
+	private int blockCheck = 0;
 	private String formattedTime = "00:00:000";
 
 	// Saving
 	private String saveDataPath;
-	private String fileName = "SaveData";
+	private String fileName = "SaveDatatwo";
 
-	public GameBoard(int x, int y) {
+	public GameBoardTwo(int x, int y) {
 		try {
-			saveDataPath = GameBoard.class.getProtectionDomain()
+			saveDataPath = GameBoardOne.class.getProtectionDomain()
 					.getCodeSource().getLocation().toURI().getPath();
 			// saveDataPath = System.getProperty("user.home") +
 			// "\\workspace\\2048finalJAVA";
@@ -199,14 +200,30 @@ public class GameBoard {
 		if (hasStarted && elapsedMS < marqueeTime)
 			Marquee("START", g);
 
-		// Direction will be reversed if ...
-		if (reverse && elapsedMS < marqueeTime)
-			Marquee("REVERSE", g);
+		// Direction will be reversed if rival's time % this.score = 2
+//		if (reverseCheck < 2
+//				&& GameBoardOne.getElapsedMS() - this.score == 12348) {
+//			reverseCheck++;
+//			reverse = true;
+//		}
+//		if (reverseCheck < 2 && elapsedMS < marqueeTime)
+//			Marquee("REVERSE", g);
 
-		// Block will come out randomly if ...
-		if (blockCheck && elapsedMS < marqueeTime) {
-			Marquee("BLOCK BOUNCE", g);
-			blockSpawn();
+		// Block will come out randomly if rival's score is more than 150. (max
+		// Block = 2)
+		if (blockCheck < 2) {
+			if (this.getScore() - GameBoardOne.getScore() > 150 && blockCheck == 0) {
+				Marquee("BLOCK-BOUNCE", g);
+				blockSpawn();
+				blockCheck++;
+			} else if (this.getScore() - GameBoardOne.getScore() > 700
+					&& blockCheck == 1) {
+				Marquee("BOUNCE-Again", g);
+				blockSpawn();
+				blockCheck++;
+			} else {
+			}
+
 		}
 
 		if (!win || !dead) {
@@ -217,7 +234,7 @@ public class GameBoard {
 					85 + DrawUtils.getMessageHeight("SPEC. to pause",
 							Game.main.deriveFont(15f), g));
 		}
-		
+
 		if (pauseCount % 2 == 1) {
 
 			g.setColor(new Color(0x00BE61));
@@ -239,7 +256,7 @@ public class GameBoard {
 					30,
 					85 + DrawUtils.getMessageHeight("R to restart",
 							Game.main.deriveFont(15f), g));
-			
+
 			g.setColor(new Color(0x006BDC));
 			g.drawString(
 					"You Win",
@@ -259,7 +276,7 @@ public class GameBoard {
 					30,
 					85 + DrawUtils.getMessageHeight("R to restart",
 							Game.main.deriveFont(15f), g));
-			
+
 			g.setColor(new Color(0x006BDC));
 			g.drawString(
 					"Game Over",
@@ -277,7 +294,7 @@ public class GameBoard {
 					30,
 					85 + DrawUtils.getMessageHeight("R to restart",
 							Game.main.deriveFont(15f), g));
-			
+
 			g.setColor(new Color(0x006BDC));
 			g.drawString(
 					"You Lose",
@@ -288,21 +305,6 @@ public class GameBoard {
 					BOARD_HEIGHT
 							- DrawUtils.getMessageHeight("You Win",
 									Game.main.deriveFont(50f), g) - 10);
-		}
-
-	}
-
-	public void render2(Graphics2D g) {
-		Graphics2D g2d = (Graphics2D) finalBoard.getGraphics();
-		g2d.drawImage(gameBoard, 0, 0, null);
-		for (int row = 0; row < ROWS; row++) {
-			for (int col = 0; col < COLS; col++) {
-				Tile current = board[row][col];
-				if (current == null)
-					continue;
-				current.render(g2d);
-
-			}
 		}
 
 	}
@@ -574,13 +576,13 @@ public class GameBoard {
 				hasStarted = true;
 		}
 
-		if (KeyboardTwo.typed(KeyEvent.VK_SPACE)) {
-			if (!hasStarted) {
-				pauseCount = 0;
-				hasStarted = true;
-			}
-			checkPause();
-		}
+//		if (KeyboardTwo.typed(KeyEvent.VK_SPACE)) {
+//			if (!hasStarted) {
+//				pauseCount = 0;
+//				hasStarted = true;
+//			}
+//			checkPause();
+//		}
 	}
 
 	private void moveTiles(Direction direction) {
@@ -805,6 +807,14 @@ public class GameBoard {
 			return false;
 		}
 
+	}
+
+	public static int getScore() {
+		return score;
+	}
+
+	public static long getElapsedMS() {
+		return elapsedMS;
 	}
 
 	public int getTileY(int row) {
