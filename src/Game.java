@@ -8,8 +8,8 @@ import javax.swing.JPanel;
 public class Game extends JPanel implements KeyListener, Runnable {
 
 	private static final long serialVersionUID = 1L;
-	public static final int WIDTH = 500;
-	public static final int HEIGHT = 500;
+	public static int WIDTH = 500;
+	public static int HEIGHT = 500;
 	public static final Font main = new Font("Bebas Neue Regular", Font.PLAIN,
 			28);
 	private Thread game;
@@ -17,10 +17,6 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT,
 			BufferedImage.TYPE_INT_RGB);
 	private GameBoard board;
-
-	private long startTime;
-	private long elapsed;
-	private boolean set;
 
 	public Game() {
 		setFocusable(true);
@@ -38,7 +34,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	}
 
 	private void render() {
-		// Render Board
+		// Render Board*
 		Graphics2D g = (Graphics2D) image.getGraphics();
 		g.setColor(Color.white);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
@@ -130,6 +126,14 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	@Override
 	public void keyTyped(KeyEvent e) {
 
+	}
+
+	public static void setWIDTH(int wIDTH) {
+		WIDTH = wIDTH;
+	}
+
+	public static void setHEIGHT(int hEIGHT) {
+		HEIGHT = hEIGHT;
 	}
 
 }

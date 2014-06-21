@@ -9,7 +9,7 @@ public class Keyboard {
 	}
 
 	public static void update() {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 6; i++) {
 			switch (i) {
 			case 0:
 				prev[KeyEvent.VK_LEFT] = pressed[KeyEvent.VK_LEFT];
@@ -23,6 +23,14 @@ public class Keyboard {
 			case 3:
 				prev[KeyEvent.VK_DOWN] = pressed[KeyEvent.VK_DOWN];
 				break;
+
+			case 4:
+				prev[KeyEvent.VK_SPACE] = pressed[KeyEvent.VK_SPACE];
+				break;
+				
+			case 5:
+				prev[KeyEvent.VK_Q] = pressed[KeyEvent.VK_Q];
+				break;
 			}
 		}
 	}
@@ -34,8 +42,8 @@ public class Keyboard {
 	public static void keyreleased(KeyEvent e) {
 		pressed[e.getKeyCode()] = false;
 	}
-	
-	public static boolean typed(int keyEvent){
+
+	public static boolean typed(int keyEvent) {
 		return !pressed[keyEvent] && prev[keyEvent];
 	}
 }

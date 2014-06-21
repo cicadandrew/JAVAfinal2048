@@ -26,7 +26,7 @@ public class Tile {
 	private boolean combineAnime = false;
 	private double scaleCombine = 1.3;
 	private BufferedImage combineImage;
-	private boolean canCombine;
+	private boolean canCombine = true;
 
 	public Tile(int value, int x, int y) {
 		this.value = value;
@@ -45,6 +45,9 @@ public class Tile {
 	private void drawImage() {
 		Graphics2D g = (Graphics2D) tileImage.getGraphics();
 		switch (this.value) {
+		case 0:
+			background = new Color(0xFCFF19);
+			break;
 		case 2:
 			background = new Color(0xe9e9e9);
 			text = new Color(0x000000);
@@ -90,8 +93,7 @@ public class Tile {
 			text = new Color(0xffffff);
 			break;
 		default:
-			background = Color.black;
-			text = Color.white;
+			background = Color.darkGray;
 		}
 
 		g.setColor(new Color(0, 0, 0, 0));
@@ -99,6 +101,9 @@ public class Tile {
 
 		g.setColor(background);
 		g.fillRoundRect(0, 0, WIDTH, HEIGHT, ARC_WIDTH, ARC_HEIGHT);
+
+		if (value <= 0)
+			return;
 
 		g.setColor(text);
 
@@ -115,6 +120,7 @@ public class Tile {
 		int drawY = HEIGHT / 2
 				+ DrawUtils.getMessageHeight("" + value, font, g) / 2;
 		g.drawString("" + value, drawX, drawY);
+
 		g.dispose();
 
 	}
