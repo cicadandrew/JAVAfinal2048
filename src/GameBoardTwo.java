@@ -715,7 +715,7 @@ public class GameBoardTwo {
 		if (GameBoardOne.isDead())
 			timeBonus += 500;
 		else
-			BraveBonus = (score - GameBoardOne.getScore()) * 15 + 500;
+			BraveBonus = (score - GameBoardOne.getScore()) * 15;
 
 		finalGrade = (long) (GameBoardOne.getElapsedMS() * 0.5) / 36000000
 				+ timeBonus + BraveBonus + (long) (score * 1.5)
