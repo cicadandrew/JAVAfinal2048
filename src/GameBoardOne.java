@@ -58,6 +58,7 @@ public class GameBoardOne {
 	private String saveDataPathone;
 	private String fileName = "SaveDatatwo";
 	private int timeBonus;
+	private int BraveBonus;
 
 	public GameBoardOne(int x, int y) {
 		try {
@@ -723,9 +724,11 @@ public class GameBoardOne {
 			timeBonus = 500;
 		if (GameBoardTwo.isDead())
 			timeBonus += 500;
+		if (!GameBoardTwo.isDead())
+			BraveBonus = (score - GameBoardOne.getScore())*15+500;
 		
 		finalGrade = (long) (GameBoardOne.getElapsedMS() * 0.5) / 36000000
-				 + timeBonus + (long) (score * 1.5) + (long) (blockCheck * 10);
+				 + timeBonus +BraveBonus+ (long) (score * 1.5) + (long) (blockCheck * 10);
 		setHighScore();
 
 	}

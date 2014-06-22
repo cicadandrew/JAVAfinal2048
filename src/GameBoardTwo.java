@@ -52,6 +52,7 @@ public class GameBoardTwo {
 	private String saveDataPathtwo;
 	private String fileName = "SaveDatatwo";
 	private int timeBonus;
+	private int BraveBonus;
 
 	public GameBoardTwo(int x, int y) {
 		try {
@@ -707,14 +708,15 @@ public class GameBoardTwo {
 		}
 
 		dead = true;
-		if (!win)
+		if (win)
 			timeBonus = 500;
-		if (GameBoardOne.isDead())
+		if (GameBoardTwo.isDead())
 			timeBonus += 500;
-		overTime = GameBoardOne.getFormattedTime();
+		if (!GameBoardTwo.isDead())
+			BraveBonus = (score - GameBoardOne.getScore())*15+500;
+		
 		finalGrade = (long) (GameBoardOne.getElapsedMS() * 0.5) / 36000000
-				+ timeBonus + (long) (score * 1.5) + (long) (blockCheck * 10);
-		setHighScore();
+				 + timeBonus +BraveBonus+ (long) (score * 1.5) + (long) (blockCheck * 10);
 
 	}
 
