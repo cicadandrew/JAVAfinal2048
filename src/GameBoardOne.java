@@ -231,8 +231,7 @@ public class GameBoardOne {
 
 		// Direction will be reversed if time % this.score = 3,
 		// in 3 sec.
-		if (this.elapsedMS
-				% (this.score*4.59 + 1) == 3)
+		if (this.elapsedMS % (this.score * 4.59 + 1) == 3)
 			reverse = true;
 
 		if (reverse && blockBoo || crashChek == 1) {
@@ -417,30 +416,38 @@ public class GameBoardOne {
 
 	void update() {
 
-		if (!win && !dead) {
-			if (hasStarted) {
+		if (!GameBoardTwo.isDead() && !GameBoardTwo.isWin()) {
 
-				elapsedMS = (System.nanoTime() - startTime) / 1000000;
-				formattedTime = formateTime(elapsedMS);
+			if (!win && !dead) {
+				if (hasStarted) {
 
-			} else {
-				startTime = System.nanoTime();
+					elapsedMS = (System.nanoTime() - startTime) / 1000000;
+					formattedTime = formateTime(elapsedMS);
+
+				} else {
+					startTime = System.nanoTime();
+				}
 			}
-		}
+		} else
+			formattedTime = GameBoardTwo.getOverTime();
 
 		checkKeys();
 
-		if (!win && !dead) {
-			if (pauseCount % 2 == 0) {
+		if (!GameBoardTwo.isDead() && !GameBoardTwo.isWin()) {
 
-				elapsedMS = pauseTime / 1000000;
+			if (!win && !dead) {
+				if (pauseCount % 2 == 0) {
 
-			} else if (restartTime != 0) {
-				elapsedMS = (System.nanoTime() - (restartTime - pauseTime) - startTime) / 1000000;
+					elapsedMS = pauseTime / 1000000;
+
+				} else if (restartTime != 0) {
+					elapsedMS = (System.nanoTime() - (restartTime - pauseTime) - startTime) / 1000000;
+				}
+
+				formattedTime = formateTime(elapsedMS);
 			}
-
-			formattedTime = formateTime(elapsedMS);
-		}
+		} else
+			formattedTime = GameBoardTwo.getOverTime();
 
 		if (score >= highScore) {
 			highScore = score;
@@ -720,15 +727,17 @@ public class GameBoardOne {
 
 		dead = true;
 		overTime = GameBoardOne.getFormattedTime();
+
 		if (win)
 			timeBonus = 500;
 		if (GameBoardTwo.isDead())
 			timeBonus += 500;
-		if (!GameBoardTwo.isDead())
-			BraveBonus = (score - GameBoardOne.getScore())*15+500;
-		
+		else
+			BraveBonus = (score - GameBoardOne.getScore()) * 15 + 500;
+
 		finalGrade = (long) (GameBoardOne.getElapsedMS() * 0.5) / 36000000
-				 + timeBonus +BraveBonus+ (long) (score * 1.5) + (long) (blockCheck * 10);
+				+ timeBonus + BraveBonus + (long) (score * 1.5)
+				+ (long) (blockCheck * 10);
 		setHighScore();
 
 	}

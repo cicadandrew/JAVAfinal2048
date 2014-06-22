@@ -45,7 +45,7 @@ public class GameBoardTwo {
 	private boolean reverse;
 	private boolean blockBoo;
 	private int blockCheck = 0;
-	private String overTime;
+	private static String overTime;
 	private long finalGrade;
 
 	// Saving
@@ -708,15 +708,18 @@ public class GameBoardTwo {
 		}
 
 		dead = true;
+		overTime = GameBoardOne.getFormattedTime();
+		
 		if (win)
 			timeBonus = 500;
-		if (GameBoardTwo.isDead())
+		if (GameBoardOne.isDead())
 			timeBonus += 500;
-		if (!GameBoardTwo.isDead())
-			BraveBonus = (score - GameBoardOne.getScore())*15+500;
-		
+		else
+			BraveBonus = (score - GameBoardOne.getScore()) * 15 + 500;
+
 		finalGrade = (long) (GameBoardOne.getElapsedMS() * 0.5) / 36000000
-				 + timeBonus +BraveBonus+ (long) (score * 1.5) + (long) (blockCheck * 10);
+				+ timeBonus + BraveBonus + (long) (score * 1.5)
+				+ (long) (blockCheck * 10);
 
 	}
 
@@ -874,6 +877,10 @@ public class GameBoardTwo {
 
 	public static boolean isWin() {
 		return win;
+	}
+
+	public static String getOverTime() {
+		return overTime;
 	}
 
 }
