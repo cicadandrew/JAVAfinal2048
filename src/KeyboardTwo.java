@@ -1,6 +1,6 @@
 import java.awt.event.KeyEvent;
 
-public class KeyboardTwo extends Keyboard{
+public class KeyboardTwo extends Keyboard {
 	public static boolean[] pressed = Keyboard.pressed;
 	public static boolean[] prev = Keyboard.prev;
 
@@ -9,8 +9,10 @@ public class KeyboardTwo extends Keyboard{
 	}
 
 	public static void update() {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 5; i++) {
 			switch (i) {
+			case 4:
+				break;
 
 			case 0:
 				prev[KeyEvent.VK_W] = pressed[KeyEvent.VK_W];
@@ -24,6 +26,9 @@ public class KeyboardTwo extends Keyboard{
 			case 3:
 				prev[KeyEvent.VK_D] = pressed[KeyEvent.VK_D];
 				break;
+				
+
+
 			}
 		}
 	}

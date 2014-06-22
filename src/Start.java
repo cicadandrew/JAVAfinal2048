@@ -16,8 +16,8 @@ public class Start {
 				+ "\n \"REVERSE\" 隨機的上下左右相反事件"
 				+ "\n \"BLOCK-BOUNCE\" 兩人分數出現差距，高者遊戲盤會出現方塊阻撓" + "\n 開心玩吧!");
 		window.setLayout(new GridLayout(1, 2));
-		window.add(game1);
 		window.add(game2);
+		window.add(game1);
 		window.pack();
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);

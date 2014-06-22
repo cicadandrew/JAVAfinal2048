@@ -35,12 +35,13 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	}
 
 	private void update() {
-		if (player == 1) {
-			boardOne.update();
-			KeyboardOne.update();
-		} else {
+		if (player == 2) {
 			boardTwo.update();
 			KeyboardTwo.update();
+
+		} else {
+			boardOne.update();
+			KeyboardOne.update();
 		}
 
 	}

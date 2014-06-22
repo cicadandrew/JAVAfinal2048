@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
@@ -45,6 +46,9 @@ public class Tile {
 	private void drawImage() {
 		Graphics2D g = (Graphics2D) tileImage.getGraphics();
 		switch (this.value) {
+		case -5:
+			background = new Color(0x4A6D92);
+			break;
 		case 0:
 			background = new Color(0xFCFF19);
 			break;
@@ -93,7 +97,8 @@ public class Tile {
 			text = new Color(0xffffff);
 			break;
 		default:
-			background = Color.darkGray;
+			background = Color.black;
+			text = Color.white;
 		}
 
 		g.setColor(new Color(0, 0, 0, 0));

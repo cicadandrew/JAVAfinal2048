@@ -19,9 +19,9 @@ public class GameBoardOne {
 	private final int startingTiles = 2;
 	private Tile[][] board;
 	private Tile block;
-	private boolean dead;
+	private static boolean dead;
+	private static boolean win;
 
-	private boolean win;
 	private BufferedImage gameBoard;
 	private BufferedImage finalBoard;
 	private int x;
@@ -36,28 +36,35 @@ public class GameBoardOne {
 
 	private static long elapsedMS;
 	private long fastestMS;
-	private long startTime;
-	private long pauseTime;
-	private long restartTime = 0;
-	private int pauseCount = 0;
-	private int marqueeStart;
+	private static long startTime;
+	private static long pauseTime;
+	private static long restartTime = 0;
+	private static int pauseCount = 0;
 	private int marqueeTime = 1000;
 	private boolean hasStarted;
 	private boolean reverse;
+	private boolean blockBoo;
+	private boolean crash;
+	private int crashChek;
+	private int marqueeCheck1;
+	private int marqueeCheck2;
 	private int reverseCheck = 0;
 	private int blockCheck = 0;
-	private String formattedTime = "00:00:000";
+	private static String formattedTime = "00:00:000";
+	private String overTime;
+	private long finalGrade;
 
 	// Saving
 	private String saveDataPathone;
 	private String fileName = "SaveDatatwo";
+	private int timeBonus;
 
 	public GameBoardOne(int x, int y) {
 		try {
-//			saveDataPath = GameBoardOne.class.getProtectionDomain()
-//					.getCodeSource().getLocation().toURI().getPath();
-			 saveDataPathone = System.getProperty("user.home") +
-			 "\\workspace\\2048finalJAVA";
+			// saveDataPathone = GameBoardOne.class.getProtectionDomain()
+			// .getCodeSource().getLocation().toURI().getPath();
+			saveDataPathone = System.getProperty("user.home")
+					+ "\\workspace\\2048finalJAVA";
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -199,53 +206,74 @@ public class GameBoardOne {
 		// Marquee
 		// Start
 		if (hasStarted && elapsedMS < 1000) {
-			marqueeStart = 0;
-			Marquee("START", g);
+			Marquee("START", g, 0);
 		}
 
-		// Direction will be reversed if rival's time % this.score = 2
-		if (reverseCheck < 2
-				&& GameBoardTwo.getElapsedMS() % (this.score + 1) == 2) {
-			reverseCheck++;
-			reverse = true;
-		}
-		if (reverse) {
-			if (reverseCheck == 0)
-				marqueeStart = (int) elapsedMS;
-			Marquee("REVERSE", g);
-		}
+		// Block will come out randomly if rival's score is less than yours 100
+		if (this.getScore() - GameBoardTwo.getScore() > 100)
+			blockBoo = true;
 
-		// Block will come out randomly if rival's score is more than 150 and
-		// 700. (max
-		// Block = 2)
-
-		if (blockCheck < 2) {
-			// if(blockCheck == 0)
-			// marqueeStart = (int) elapsedMS;
-			if (this.getScore() - GameBoardTwo.getScore() > 150
-					&& blockCheck < 1) {
-				// Marquee("BLOCK", g);
-				blockSpawn();
+		if (blockBoo) {
+			if (blockCheck == 0) {
+				marqueeCheck1 = (int) elapsedMS;
 				blockCheck++;
-
-			} else if (this.getScore() - GameBoardTwo.getScore() > 700) {
-				// Marquee("BLOCK", g);
 				blockSpawn();
+			} else if (blockCheck == 1
+					&& elapsedMS - marqueeCheck1 > marqueeTime * 10) {
+				marqueeCheck1 = (int) elapsedMS;
 				blockCheck++;
-			} else {
+				blockSpawn();
 			}
+			Marquee("BLOCK!", g, marqueeCheck1);
+			blockBoo = false;
 		}
 
-		// if (!win || !dead) {
-		// g.setColor(Color.red);
-		// g.drawString(
-		// "SPEC. to pause",
-		// 30,
-		// 85 + DrawUtils.getMessageHeight("SPEC. to pause",
-		// Game.main.deriveFont(15f), g));
-		// }
+		// Direction will be reversed if time % this.score = 3,
+		// in 3 sec.
+		if (this.elapsedMS
+				% (this.score*4.59 + 1) == 3)
+			reverse = true;
 
-		if (pauseCount % 2 == 1) {
+		if (reverse && blockBoo || crashChek == 1) {
+			crash = true;
+			crashChek++;
+		}
+
+		if (crash) {
+			marqueeCheck2 = +1000;
+			crashChek--;
+			crash = false;
+		}
+
+		if (reverse) {
+			if (reverseCheck == 0) {
+				marqueeCheck2 = (int) elapsedMS;
+				reverseCheck++;
+			} else if (reverseCheck == 1
+					&& elapsedMS - marqueeCheck2 > marqueeTime * 25) {
+				marqueeCheck2 = (int) elapsedMS;
+				reverseCheck++;
+			} else if (reverseCheck == 1
+					&& elapsedMS - marqueeCheck2 > marqueeTime * 40) {
+				marqueeCheck2 = (int) elapsedMS;
+				reverseCheck++;
+			}
+
+			Marquee("REVERSE!", g, marqueeCheck2);
+			System.out.println(true);
+			if (elapsedMS - marqueeCheck2 > marqueeTime * 3)
+				reverse = false;
+		}
+
+		// Win, Dead and Game over
+		if (!win || !dead) {
+			g.setColor(Color.red);
+			g.drawString("SPEC. to pause/ start", 30, 85 + DrawUtils
+					.getMessageHeight("SPEC. to pause/ start",
+							Game.main.deriveFont(15f), g));
+		}
+
+		if (pauseCount % 2 == 0 && pauseCount != 0) {
 
 			g.setColor(new Color(0x00BE61));
 			g.drawString(
@@ -258,69 +286,80 @@ public class GameBoardOne {
 							- DrawUtils.getMessageHeight("P A U S E",
 									Game.main.deriveFont(50f), g) - 10);
 		}
+		if (!GameBoardOne.isWin() && !GameBoardOne.isDead()) {
+			if (win && !dead) {
+				g.setColor(new Color(0x006BDC));
+				g.drawString(
+						"You Win",
+						Game.WIDTH
+								/ 2
+								- DrawUtils.getMessageWidth("You Win",
+										Game.main.deriveFont(50f), g) / 2,
+						BOARD_HEIGHT
+								- DrawUtils.getMessageHeight("You Win",
+										Game.main.deriveFont(50f), g) - 10);
+			}
 
-		if (win && !dead) {
-			g.setColor(Color.red);
+			else if (dead && win) {
+				g.setColor(new Color(0x006BDC));
+				g.drawString(
+						"Game Over",
+						Game.WIDTH
+								/ 2
+								- DrawUtils.getMessageWidth("You Win",
+										Game.main.deriveFont(50f), g) / 2,
+						BOARD_HEIGHT
+								- DrawUtils.getMessageHeight("You Win",
+										Game.main.deriveFont(50f), g) - 10);
+			} else if (!win && dead) {
+				g.setColor(new Color(0x006BDC));
+				g.drawString(
+						"You Lose",
+						Game.WIDTH
+								/ 2
+								- DrawUtils.getMessageWidth("You Win",
+										Game.main.deriveFont(50f), g) / 2,
+						BOARD_HEIGHT
+								- DrawUtils.getMessageHeight("You Win",
+										Game.main.deriveFont(50f), g) - 10);
+			}
+		} else if (win || dead) {
+			g.setColor(new Color(0xA00200));
 			g.drawString(
-					"R to restart",
-					30,
-					85 + DrawUtils.getMessageHeight("R to restart",
-							Game.main.deriveFont(15f), g));
-
-			g.setColor(new Color(0x006BDC));
-			g.drawString(
-					"You Win",
+					"GRADE",
 					Game.WIDTH
 							/ 2
-							- DrawUtils.getMessageWidth("You Win",
-									Game.main.deriveFont(50f), g) / 2,
+							- DrawUtils.getMessageWidth("GRADE",
+									Game.main.deriveFont(70f), g) / 2,
 					BOARD_HEIGHT
-							- DrawUtils.getMessageHeight("You Win",
-									Game.main.deriveFont(50f), g) - 10);
-		}
-
-		else if (dead && win) {
-			g.setColor(Color.red);
+							- DrawUtils.getMessageHeight("GRADE",
+									Game.main.deriveFont(70f), g) - 100);
 			g.drawString(
-					"R to restart",
-					30,
-					85 + DrawUtils.getMessageHeight("R to restart",
-							Game.main.deriveFont(15f), g));
-
-			g.setColor(new Color(0x006BDC));
-			g.drawString(
-					"Game Over",
+					"SCORE: " + this.score,
 					Game.WIDTH
 							/ 2
-							- DrawUtils.getMessageWidth("You Win",
-									Game.main.deriveFont(50f), g) / 2,
+							- DrawUtils.getMessageWidth("SCORE: " + this.score,
+									Game.main.deriveFont(42f), g) / 2,
 					BOARD_HEIGHT
-							- DrawUtils.getMessageHeight("You Win",
-									Game.main.deriveFont(50f), g) - 10);
-		} else if (!win && dead) {
-			g.setColor(Color.red);
+							- DrawUtils.getMessageHeight(
+									"SCORE: " + this.score,
+									Game.main.deriveFont(42f), g) - 50);
 			g.drawString(
-					"R to restart",
-					30,
-					85 + DrawUtils.getMessageHeight("R to restart",
-							Game.main.deriveFont(15f), g));
-
-			g.setColor(new Color(0x006BDC));
-			g.drawString(
-					"You Lose",
+					"Final: " + this.finalGrade,
 					Game.WIDTH
 							/ 2
-							- DrawUtils.getMessageWidth("You Win",
-									Game.main.deriveFont(50f), g) / 2,
+							- DrawUtils.getMessageWidth("Final: "
+									+ this.finalGrade,
+									Game.main.deriveFont(42f), g) / 2,
 					BOARD_HEIGHT
-							- DrawUtils.getMessageHeight("You Win",
-									Game.main.deriveFont(50f), g) - 10);
+							- DrawUtils.getMessageHeight("Final: "
+									+ this.finalGrade,
+									Game.main.deriveFont(42f), g) + 50);
 		}
 
 	}
 
 	private void start() {
-		// blockSpawn();
 		for (int i = 0; i < startingTiles; i++) {
 			spawnRandom();
 		}
@@ -329,18 +368,19 @@ public class GameBoardOne {
 
 	private void blockSpawn() {
 		Random random = new Random();
+		boolean notValid = true;
 
-		int location = random.nextInt(COLS * ROWS);
-		int row = location / ROWS;
-		int col = location % COLS;
-		block = new Tile(-1, getTileX(col), getTileY(row));
-		board[row][col] = block;
+		while (notValid) {
+			int location = random.nextInt(COLS * ROWS);
+			int row = location / ROWS;
+			int col = location % COLS;
+			block = new Tile(-5, getTileX(col), getTileY(row));
+			board[row][col] = block;
+
+			notValid = false;
+		}
 
 	}
-
-	// private void spawn(int row, int col, int value) {
-	// board[row][col] = new Tile(value, getTileX(col), getTileY(row));
-	// }
 
 	private void spawnRandom() {
 		Random random = new Random();
@@ -390,7 +430,7 @@ public class GameBoardOne {
 		checkKeys();
 
 		if (!win && !dead) {
-			if (pauseCount % 2 == 1) {
+			if (pauseCount % 2 == 0) {
 
 				elapsedMS = pauseTime / 1000000;
 
@@ -453,28 +493,30 @@ public class GameBoardOne {
 
 	}
 
-	private void Marquee(String marquee, Graphics2D g) {
+	private void Marquee(String marquee, Graphics2D g, int marqueeStart) {
+
 		g.setColor(new Color(0xBD211F));
 		int marqueeLength = DrawUtils.getMessageWidth(marquee,
 				Game.main.deriveFont(50f), g);
 		int marqueeWidth = DrawUtils.getMessageHeight(marquee,
 				Game.main.deriveFont(50f), g);
 
-		if (elapsedMS - marqueeStart < marqueeTime * 0.3)
-			g.drawString(
-					marquee,
-					(int) ((Game.WIDTH - marqueeLength)
-							* (elapsedMS - marqueeStart) / (marqueeTime * 0.3) - marqueeLength),
-					BOARD_HEIGHT - marqueeWidth - 10);
-		else if ((elapsedMS - marqueeStart) < marqueeTime * 0.7)
-			g.drawString(marquee, (Game.WIDTH - marqueeLength) / 2,
-					BOARD_HEIGHT - marqueeWidth - 10);
-		else
-			g.drawString(marquee, (int) ((Game.WIDTH - marqueeLength)
-					* ((elapsedMS - marqueeStart) - marqueeTime * 0.4)
-					/ (marqueeTime * 0.3) - marqueeLength), BOARD_HEIGHT
-					- marqueeWidth - 10);
-
+		if (elapsedMS - marqueeStart < marqueeTime) {
+			if (elapsedMS - marqueeStart < marqueeTime * 0.3)
+				g.drawString(marquee,
+						(int) ((Game.WIDTH - marqueeLength)
+								* (elapsedMS - marqueeStart)
+								/ (marqueeTime * 0.3) - marqueeLength),
+						BOARD_HEIGHT - marqueeWidth - 10);
+			else if ((elapsedMS - marqueeStart) < marqueeTime * 0.7)
+				g.drawString(marquee, (Game.WIDTH - marqueeLength) / 2,
+						BOARD_HEIGHT - marqueeWidth - 10);
+			else
+				g.drawString(marquee, (int) ((Game.WIDTH - marqueeLength)
+						* ((elapsedMS - marqueeStart) - marqueeTime * 0.4)
+						/ (marqueeTime * 0.3) - marqueeLength), BOARD_HEIGHT
+						- marqueeWidth - 10);
+		}
 	}
 
 	private String formateTime(long mills) {
@@ -534,57 +576,39 @@ public class GameBoardOne {
 	}
 
 	private void checkKeys() {
-		if (win || dead) {
-			if (KeyboardOne.typed(KeyEvent.VK_R)) {
-				hasStarted = false;
-				start();
-			}
-		}
 
 		if (KeyboardOne.typed(KeyEvent.VK_LEFT)) {
-			if (pauseCount % 2 == 1)
+			if (pauseCount % 2 == 0)
 				return;
 
 			if (reverse)
 				moveTiles(Direction.RIGHT);
 			else
 				moveTiles(Direction.LEFT);
-
-			if (!hasStarted)
-				hasStarted = true;
 		}
 		if (KeyboardOne.typed(KeyEvent.VK_RIGHT)) {
-			if (pauseCount % 2 == 1)
+			if (pauseCount % 2 == 0)
 				return;
 			if (reverse)
 				moveTiles(Direction.LEFT);
 			else
 				moveTiles(Direction.RIGHT);
-
-			if (!hasStarted)
-				hasStarted = true;
 		}
 		if (KeyboardOne.typed(KeyEvent.VK_UP)) {
-			if (pauseCount % 2 == 1)
+			if (pauseCount % 2 == 0)
 				return;
 			if (reverse)
 				moveTiles(Direction.DOWN);
 			else
 				moveTiles(Direction.UP);
-
-			if (!hasStarted)
-				hasStarted = true;
 		}
 		if (KeyboardOne.typed(KeyEvent.VK_DOWN)) {
-			if (pauseCount % 2 == 1)
+			if (pauseCount % 2 == 0)
 				return;
 			if (reverse)
 				moveTiles(Direction.UP);
 			else
 				moveTiles(Direction.DOWN);
-
-			if (!hasStarted)
-				hasStarted = true;
 		}
 
 		if (KeyboardOne.typed(KeyEvent.VK_SPACE)) {
@@ -670,7 +694,7 @@ public class GameBoardOne {
 		for (int row = 0; row < ROWS; row++) {
 			for (int col = 0; col < COLS; col++) {
 				Tile current = board[row][col];
-				if (current == null)
+				if (current == null || current.getValue() < 0)
 					continue;
 				current.setCanCombine(true);
 			}
@@ -694,24 +718,36 @@ public class GameBoardOne {
 		}
 
 		dead = true;
+		overTime = GameBoardOne.getFormattedTime();
+		if (win)
+			timeBonus = 500;
+		if (GameBoardTwo.isDead())
+			timeBonus += 500;
+		
+		finalGrade = (long) (GameBoardOne.getElapsedMS() * 0.5) / 36000000
+				 + timeBonus + (long) (score * 1.5) + (long) (blockCheck * 10);
 		setHighScore();
 
 	}
 
-	private void checkPause() {
+	void checkPause() {
 		pauseCount++;
 
-		if (pauseCount % 2 == 1) {
+		if (pauseCount % 2 == 0) {
 
 			pauseTime = (System.nanoTime() - (restartTime - pauseTime) - startTime);
 
 		} else
 			restartTime = (System.nanoTime() - startTime);
 
-		if (restartTime != 0 && pauseCount % 2 == 0)
+		if (restartTime != 0 && pauseCount % 2 == 1)
 			System.out
 					.println(formateTime((restartTime - pauseTime) / 1000000));
 
+	}
+
+	public static int getPauseCount() {
+		return pauseCount;
 	}
 
 	private boolean checkSurroundingTiles(int row, int col, Tile current) {
@@ -719,32 +755,36 @@ public class GameBoardOne {
 			Tile check = board[row - 1][col];
 			if (check == null)
 				return true;
-			if (current.getValue() == check.getValue() || check.getValue() == 0
-					|| current.getValue() == 0)
+			else if ((current.getValue() == check.getValue()
+					|| check.getValue() == 0 || current.getValue() == 0)
+					&& check.getValue() >= 0)
 				return true;
 		}
 		if (row < ROWS - 1) {
 			Tile check = board[row + 1][col];
 			if (check == null)
 				return true;
-			if (current.getValue() == check.getValue() || check.getValue() == 0
-					|| current.getValue() == 0)
+			else if ((current.getValue() == check.getValue()
+					|| check.getValue() == 0 || current.getValue() == 0)
+					&& check.getValue() >= 0)
 				return true;
 		}
 		if (col > 0) {
 			Tile check = board[row][col - 1];
 			if (check == null)
 				return true;
-			if (current.getValue() == check.getValue() || check.getValue() == 0
-					|| current.getValue() == 0)
+			else if ((current.getValue() == check.getValue()
+					|| check.getValue() == 0 || current.getValue() == 0)
+					&& check.getValue() >= 0)
 				return true;
 		}
 		if (col < COLS - 1) {
 			Tile check = board[row][col + 1];
 			if (check == null)
 				return true;
-			if (current.getValue() == check.getValue() || check.getValue() == 0
-					|| current.getValue() == 0)
+			else if ((current.getValue() == check.getValue()
+					|| check.getValue() == 0 || current.getValue() == 0)
+					&& check.getValue() >= 0)
 				return true;
 		}
 		return false;
@@ -756,7 +796,7 @@ public class GameBoardOne {
 		boolean canMove = false;
 
 		Tile current = board[row][col];
-		if (current == null || current.getValue() == -1)
+		if (current == null || current.getValue() < 0)
 			return false;
 
 		boolean move = true;
@@ -768,6 +808,11 @@ public class GameBoardOne {
 			newRow += verticalDir;
 			if (checkOutOfBounds(dir, newRow, newCol))
 				break;
+			if ((board[newRow][newCol] != null && board[newRow][newCol]
+					.getValue() < 0)
+					|| (current != null && current.getValue() < 0))
+				break;
+
 			if (board[newRow][newCol] == null) {
 
 				board[newRow][newCol] = current;
@@ -776,22 +821,36 @@ public class GameBoardOne {
 				canMove = true;
 			} else if ((board[newRow][newCol].getValue() == current.getValue()
 					|| board[newRow][newCol].getValue() == 0 || current
-					.getValue() == 0) && board[newRow][newCol].canCombine()) {
+					.getValue() == 0)
+					&& board[newRow][newCol].canCombine()
+					&& (current.getValue() >= 0 || board[newRow][newCol]
+							.getValue() >= 0)) {
 
 				board[newRow][newCol].setCanCombine(false);
-				if (board[newRow][newCol].getValue() != 0)
+				if (board[newRow][newCol].getValue() != 0) {
 					board[newRow][newCol].setValue(board[newRow][newCol]
 							.getValue() * 2);
-				else if (current.getValue() != 0)
+					canMove = true;
+					board[newRow - verticalDir][newCol - horizontalDir] = null;
+					board[newRow][newCol].setSlideTo(new Point(newRow, newCol));
+					board[newRow][newCol].setCombineAnime(true);
+					score += board[newRow][newCol].getValue();
+				} else if (current.getValue() != 0) {
 					board[newRow][newCol].setValue(current.getValue() * 2);
-				else if (current.getValue() == 0
-						|| board[newRow][newCol].getValue() == 0)
+					canMove = true;
+					board[newRow - verticalDir][newCol - horizontalDir] = null;
+					board[newRow][newCol].setSlideTo(new Point(newRow, newCol));
+					board[newRow][newCol].setCombineAnime(true);
+					score += board[newRow][newCol].getValue();
+				} else if (current.getValue() == 0
+						|| board[newRow][newCol].getValue() == 0) {
 					board[newRow][newCol].setValue(64);
-				canMove = true;
-				board[newRow - verticalDir][newCol - horizontalDir] = null;
-				board[newRow][newCol].setSlideTo(new Point(newRow, newCol));
-				board[newRow][newCol].setCombineAnime(true);
-				score += board[newRow][newCol].getValue();
+					canMove = true;
+					board[newRow - verticalDir][newCol - horizontalDir] = null;
+					board[newRow][newCol].setSlideTo(new Point(newRow, newCol));
+					board[newRow][newCol].setCombineAnime(true);
+					score += board[newRow][newCol].getValue();
+				}
 
 			} else {
 				move = false;
@@ -828,6 +887,10 @@ public class GameBoardOne {
 		return elapsedMS;
 	}
 
+	public static String getFormattedTime() {
+		return formattedTime;
+	}
+
 	public int getTileY(int row) {
 		return SPACING * (1 + row) + row * Tile.HEIGHT;
 	}
@@ -836,11 +899,12 @@ public class GameBoardOne {
 		return SPACING * (1 + col) + col * Tile.WIDTH;
 	}
 
-	public static int getBOARD_WIDTH() {
-		return BOARD_WIDTH;
+	public static boolean isDead() {
+		return dead;
 	}
 
-	public static int getBOARD_HEIGHT() {
-		return BOARD_HEIGHT;
+	public static boolean isWin() {
+		return win;
 	}
+
 }
