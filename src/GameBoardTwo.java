@@ -224,7 +224,8 @@ public class GameBoardTwo {
 
 		// Direction will be reversed if time % this.score = 2 or 5,
 		// in 3 sec.
-		if (GameBoardOne.getElapsedMS() % (this.score * 1.358 + 1) == 2)
+		Random random = new Random();
+		if (GameBoardOne.getElapsedMS() % ((23+random.nextInt(10))*(random.nextInt(10)+1)) == 9)
 			reverse = true;
 
 		if (reverse && blockBoo || crashChek == 1) {

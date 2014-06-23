@@ -229,9 +229,10 @@ public class GameBoardOne {
 			blockBoo = false;
 		}
 
-		// Direction will be reversed if time % this.score = 3,
+		// Direction will be reversed if time % this.score = 7,
 		// in 3 sec.
-		if (this.elapsedMS % (this.score * 4.59 + 1) == 3)
+		Random random = new Random();
+		if (this.elapsedMS % (this.score  + ((57+random.nextInt(10))*(random.nextInt(10)+1))) == 9)
 			reverse = true;
 
 		if (reverse && blockBoo || crashChek == 1) {
@@ -240,7 +241,7 @@ public class GameBoardOne {
 		}
 
 		if (crash) {
-			marqueeCheck2 = +1000;
+			marqueeCheck2 = +500;
 			crashChek--;
 			crash = false;
 		}
